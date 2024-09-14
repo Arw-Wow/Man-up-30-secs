@@ -2,7 +2,10 @@
 
 Enemy::Enemy()
 {
-    // initialize the enemy's brithplace and velocity
+    // initialize the enemy's brithplace and velocity and size
+
+	m_width = (rand() % 30 + 10);
+	m_height = m_width;
 
     int birth_direction = rand() % 4;
 

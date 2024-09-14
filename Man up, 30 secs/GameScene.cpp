@@ -2,7 +2,7 @@
 
 GameScene::GameScene()
 {
-	timer_enemy_generation.set_interval(200);
+	timer_enemy_generation.set_interval(interval_enemy_generate);
 	timer_enemy_generation.set_loop(true);
 	timer_enemy_generation.set_shot_callback(
 		[&]() {
@@ -10,10 +10,20 @@ GameScene::GameScene()
 		}
 	);
 
+	timer_speed_up_enemy_generation.set_interval(10000);
+	timer_speed_up_enemy_generation.set_loop(true);
+	timer_speed_up_enemy_generation.set_shot_callback(
+		[&]() {
+			can_speed_up_enemy_generation = true;
+		}
+	);
+
 }
 
 void GameScene::on_enter()
 {
+	interval_enemy_generate = original_interval_enemy_generate;
+	timer_enemy_generation.set_interval(original_interval_enemy_generate);
 	timer_enemy_generation.restart();
 	timer_enemy_generation.resume();
 
@@ -32,6 +42,14 @@ void GameScene::on_input(ExMessage& msg)
 void GameScene::on_update(int delta)
 {
 	player->on_update(delta);
+
+	if (can_speed_up_enemy_generation)
+	{
+		timer_enemy_generation.set_interval(interval_enemy_generate /= 1.25);
+		timer_enemy_generation.restart();
+		std::cout << "speed up!" << std::endl;
+		can_speed_up_enemy_generation = false;
+	}
 
 	if (can_enemy_generate)
 	{
@@ -68,6 +86,7 @@ void GameScene::on_update(int delta)
 	}
 
 	timer_enemy_generation.on_update(delta);
+	timer_speed_up_enemy_generation.on_update(delta);
 }
 
 void GameScene::on_draw()
@@ -83,10 +102,10 @@ void GameScene::on_draw()
 		enemy_list[i]->on_draw();
 	}
 
-	// 绘制当前得分
+	// 绘制当前存活时间
 	alive_time = clock() - begin_time;
 	char score_text[256] = { 0 };
-	sprintf_s(score_text, sizeof(score_text), "存活时间：%ds", alive_time / 1000);
+	sprintf_s(score_text, sizeof(score_text), "存活时间：%.1lf s", alive_time / 1000.0);
 	settextstyle(18, 9, "宋体");
 	settextcolor(WHITE);
 	outtextxy(10, 10, score_text);
@@ -109,9 +128,9 @@ void GameScene::on_exit()
 
 	std::ifstream inFile;
 	inFile.open("data.txt");
-	int max_score;	inFile >> max_score;
+	double max_score = 0.0;	inFile >> max_score;
 
-	if ((int)alive_time > max_score)
+	if (alive_time > max_score)
 	{
 		std::ofstream outFile;
 		outFile.open("data.txt");

@@ -40,7 +40,12 @@ public:
 private:
 
 	Timer timer_enemy_generation;
-	bool can_enemy_generate = false;
+	bool can_enemy_generate = false;	// timer的callback只会改变这个布尔值，具体要干什么可以之后再说，从而实现解耦合。
+	const int original_interval_enemy_generate = 500;
+	int interval_enemy_generate = 500;
+
+	Timer timer_speed_up_enemy_generation;
+	bool can_speed_up_enemy_generation = false;
 
 	clock_t begin_time;
 	clock_t alive_time;

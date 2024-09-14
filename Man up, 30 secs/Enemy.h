@@ -29,8 +29,8 @@ public:
 private:
 
 	Vector2 m_position;
-	int m_width = 20;
-	int m_height = 20;
+	int m_width;
+	int m_height;
 
 	CollisionBox m_collision_box;
 

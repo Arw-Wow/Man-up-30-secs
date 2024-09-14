@@ -28,7 +28,7 @@ public:
 
 private:
 
-	int max_score = 0;
+	double max_score = 0;
 
 };
 
